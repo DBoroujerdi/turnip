@@ -1,0 +1,21 @@
+{application, turnip,
+ [{description, "An OTP application"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {turnip_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    sasl,
+    inets,
+    ssl
+   ]},
+  {env,[
+        {rabbit_host, "docker_host"},
+        {rabbit_port, "5672"}
+       ]},
+  {modules, []},
+  {contributors, []},
+  {licenses, []},
+  {links, []}
+ ]}.

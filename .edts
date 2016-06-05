@@ -1,0 +1,6 @@
+:name "turnip"
+:node-sname "turnip"
+:include-dirs '("deps")
+:lib-dirs '("deps")
+:erlang-cookie "turnip"
+:start-command "erl +P 5000000 +K true -setcookie turnip -pa ebin -pa deps/*/ebin -boot start_sasl -config dev.config -s rb -s turnip -sname turnip"
