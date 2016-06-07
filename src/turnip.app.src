@@ -1,5 +1,6 @@
 {application, turnip,
- [{description, "An OTP application"},
+ [{id, "Turnip"},
+  {description, "An OTP application"},
   {vsn, "0.1.0"},
   {registered, []},
   {mod, {turnip_app, []}},
