@@ -25,3 +25,7 @@ deps/
 /ttb_last_config
 blah/
 *.d
+.DS_Store
+cover/
+*.coverdata
+ct.cover.spec
