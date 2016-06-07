@@ -5,6 +5,8 @@ PROJECT_VERSION = 0.0.1
 DEPS = amqp any poolboy
 ERL_LIBS = deps
 
+TEST_DEPS = rabbit ct_common
+
 ERLC_OPTS = +debug_info \
             +compressed \
             +report \
@@ -17,6 +19,7 @@ ERLC_OPTS = +debug_info \
             +warn_unused_import \
             +nowarn_export_vars
 
+dep_ct_common = git git@github.com:DBoroujerdi/ct_common.git master
 
 dep_amqp = git git@github.com:rabbitmq/rabbitmq-erlang-client.git master
 dep_any = git git@github.com:shortishly/any.git master
