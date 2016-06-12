@@ -1,6 +1,12 @@
 -module(turnip).
 
+-behaviour(application).
+
 %% todo: learn and use erlang doc conventions
+
+%% callbacks
+-export([start/2,
+         stop/1]).
 
 %% Provide the additional functionality that turnip provides over and on
 %% top of the underlying amqp library.
@@ -29,6 +35,29 @@
          subscribe/3,
          acknowledge/2]).
 
+%%------------------------------------------------------------------------------
+%% callbacks
+%%------------------------------------------------------------------------------
+
+start(_Type, _Args) ->
+
+    %% read connection props from config (use env?)
+    {ok, App} = application:get_application(),
+    {ok, Config} = application:get_env(App, broker_config),
+
+    %% todo: validate config
+
+    print_banner(),
+
+    turnip_sup:start_link(Config).
+
+stop(_State) ->
+    ok.
+
+
+%%------------------------------------------------------------------------------
+%% public
+%%------------------------------------------------------------------------------
 
 start() ->
     application:ensure_all_started(?MODULE).
@@ -130,3 +159,20 @@ start_consumer(Queue, Callback) ->
 
 start_consumers(Queue, Callback, Num) ->
     turnip_consumer_pools_sup:start(Queue, Callback, Num).
+
+%%------------------------------------------------------------------------------
+%% private
+%%------------------------------------------------------------------------------
+
+print_banner() ->
+    {ok, Product} = application:get_key(id),
+    {ok, Version} = application:get_key(vsn),
+
+    io:format("~n  ##  ##         \\/ "
+              "~n  ##  ##        ####     ~s ~s."
+              "~n  ##########   ######"
+              "~n  ######  ##   ####"
+              "~n  ##########   ##" ++
+              "~n~n              Starting client..."
+              "~n",
+              [Product, Version]).
