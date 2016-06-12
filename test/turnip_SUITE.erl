@@ -37,7 +37,7 @@ init_per_suite(Config) ->
     Config.
 
 end_per_suite(Config) ->
-    rabbit_ct_helpers:run_teardown_steps(Config).
+    Config.
 
 %%------------------------------------------------------------------------------
 %% tests
