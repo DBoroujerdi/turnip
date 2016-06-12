@@ -43,13 +43,13 @@ start(_Type, _Args) ->
 
     %% read connection props from config (use env?)
     {ok, App} = application:get_application(),
-    {ok, Config} = application:get_env(App, broker_config),
+    {ok, BrokerConfig} = application:get_env(App, broker_config),
 
     %% todo: validate config
 
     print_banner(),
 
-    turnip_sup:start_link(Config).
+    turnip_sup:start_link(BrokerConfig).
 
 stop(_State) ->
     ok.
