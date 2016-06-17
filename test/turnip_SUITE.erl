@@ -32,6 +32,8 @@ init_per_suite(Config) ->
 
     application:ensure_all_started(turnip),
 
+    {ok, _} = msg_collector:start(),
+
     wait(),
 
     Config.
@@ -55,6 +57,20 @@ open_channel_test(Config) ->
 
     %% todo: is it idiomatic to assert with a test framework assertion
     %% or to just do it with pattern matching?
+
+    Config.
+
+consumer_test(Config) ->
+    ct_common:doc("Tests that messages published can be consumed"),
+
+    {ok, Channel} = turnip:open_channel(),
+    ok = msg_collector:subscribe(),
+
+    {ok, _} = turnip:start_consumer(<<"test_queue">>, test_consumer),
+    ok = turnip:declare_queue(Channel, <<"test_queue">>),
+    ok = turnip:publish(Channel, <<"Hello, World!">>, <<>>, <<"test_queue">>),
+
+    {ok, <<"Hello, World!">>} = msg_collector:receive_msg(),
 
     Config.
 
