@@ -53,6 +53,7 @@ handle_cast(_Msg, State) ->
 
 handle_info(init, State) ->
     {ok, Channel} = turnip:open_channel(),
+    true = erlang:link(Channel),
     {noreply, State#state{channel=Channel}};
 handle_info(_Info, State) ->
     {noreply, State}.
