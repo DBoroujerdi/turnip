@@ -9,7 +9,8 @@
     stdlib,
     sasl,
     inets,
-    ssl
+    ssl,
+    poolboy
    ]},
   {env,[
         {rabbit_host, "docker_host"},

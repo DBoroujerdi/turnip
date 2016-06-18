@@ -18,10 +18,10 @@ start_link(BrokerConfig) ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, [BrokerConfig]).
 
 init([BrokerConfig]) ->
-    ConnectionMgr = worker(turnip_connection_mgr, permanent, [BrokerConfig]),
+    ConnectionSup = supervisor(turnip_connection_sup, permanent, [BrokerConfig]),
     SubscribersSup = supervisor(turnip_consumer_sup, permanent, []),
 
-    {ok, {{one_for_one, 1, 5}, [ConnectionMgr, SubscribersSup]}}.
+    {ok, {{one_for_one, 1, 5}, [ConnectionSup, SubscribersSup]}}.
 
 %%------------------------------------------------------------------------------
 %% private
