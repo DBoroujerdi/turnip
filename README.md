@@ -27,24 +27,11 @@ ok = turnip:publish(<<"Hello, World!">>, <<>>, Q).
 ### Example Env
 
 ```erlang
-{turnip [
-    {host, "localhost"},
-    {port, 12345},
-    {exchanges, [
-        {"exchange_1", direct, false},
-        {"exchange_2", fanout, true}
-    ]},
-    {queues, [
-        "queue_1",
-        "queue_2"
-    ]},
-    {bindings, [
-        {"tickets", "customers"}
-    ]},
-    {consumers, [
-        {}
-    ]}
-]}
+{turnip, [{broker_config, #{
+              host => "docker_host",
+              port => 5671,
+              heartbeat => 5}}
+          ]}
 ```
 
 
