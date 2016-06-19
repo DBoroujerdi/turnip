@@ -8,21 +8,19 @@ Turnip is a wrapper around the [RabbitMq](https://github.com/rabbitmq/rabbitmq-e
 - Consumer pooling
 - Consumer behaviour
 
-## Usage
+## Basic Usage
 
 ```erlang
 ok = turnip:start(),
 
-{ok, Channel} =  open:channel(),
+{ok, Q} =  = turnip:declare_queue(),
 
-ok = turnip:declare_exchange(Channel, <<"exchange_name">>),
+ok = turnip:start_consumer(Q, turnip_example_consumer).
 
-ok = turnip:start_consumers(<<"my_queue">>, callback_module, 3),
+ok = turnip:publish(<<"Hello, World!">>, <<>>, Q).
 
-ok = turnip:publish(Channel, <<"payload">>, <<"exchange_name">>, <<"*">>).
+%% <0.629.0> MSG: <<"Hello, World!">>
 ```
-
-## todo: base documentation on peters readme docs
 
 ## Examples
 
