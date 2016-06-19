@@ -24,7 +24,7 @@ ok = turnip:publish(<<"Hello, World!">>, <<>>, Q).
 
 ## Examples
 
-[Example consumer](turnip/src/turnip_example_consumer.erl), implementing the turnip_consumer_behaviour.
+[Example consumer](src/turnip_example_consumer.erl), implementing the turnip_consumer_behaviour.
 
 ### Example Env
 
