@@ -25,25 +25,18 @@ execute(Fun) ->
     execute(Fun, []).
 
 execute(Fun, Args) ->
-    Client = self(),
-
     Transaction =
         fun(Worker) ->
-                Client ! turnip_channel_worker:execute(Worker, Fun, Args)
+            turnip_channel_worker:execute(Worker, Fun, Args)
         end,
 
     %% todo: externalise retry count
-    ok = try_execute(Transaction, Fun, Args, 5),
-    receive
-        Result -> Result
-    after 3000 ->
-            {error, timeout}
-    end.
+    try_execute(Transaction, Fun, Args, 5).
 
 try_execute(Transaction, Fun, Args, NumAttempts) ->
-    case catch poolboy:transaction(?SERVER, Transaction) of
-        ok ->
-            ok;
+    case catch poolboy:transaction(?POOL_ID, Transaction) of
+        ok -> ok;
+        {ok, _} = Result -> Result;
         AnythingElse when NumAttempts > 1 ->
             error_logger:error_report(["Execute attempt failed",
                                        {result, AnythingElse},

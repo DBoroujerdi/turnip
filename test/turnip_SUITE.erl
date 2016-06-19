@@ -1,6 +1,7 @@
 -module(turnip_SUITE).
 
 -include_lib("common_test/include/ct.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
 -compile(export_all).
 
@@ -57,6 +58,18 @@ open_channel_test(Config) ->
 
     %% todo: is it idiomatic to assert with a test framework assertion
     %% or to just do it with pattern matching?
+
+    Config.
+
+channel_pool_test(Config) ->
+    ct_common:doc("Performs a declare action to test the internal channel pool"),
+
+    {ok, QueueName} = turnip:declare_queue(),
+
+    ?assert(is_binary(QueueName)),
+    ?assertMatch(Bin when is_binary(Bin), QueueName),
+
+    ct:pal("Created channel ~p", [QueueName]),
 
     Config.
 

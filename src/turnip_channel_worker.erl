@@ -42,11 +42,8 @@ init([]) ->
     {ok, #state{}}.
 
 handle_call({exec, JobFn, Args}, _, #state{channel = Channel} = State)
-  when Channel =:= undefined ->
-    {reply, erlang:apply(turnip, JobFn, [Channel] ++ Args), State};
-handle_call(_Request, _From, State) ->
-    Reply = ok,
-    {reply, Reply, State}.
+  when Channel =/= undefined ->
+    {reply, erlang:apply(turnip, JobFn, [Channel] ++ Args), State}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
