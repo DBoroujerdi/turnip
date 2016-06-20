@@ -54,7 +54,7 @@ start(_Type, _Args) ->
     {ok, App} = application:get_application(),
     {ok, BrokerConfig} = application:get_env(App, broker_config),
 
-    %% todo: validate config
+    ok = validate(BrokerConfig),
 
     print_banner(),
 
@@ -206,3 +206,9 @@ print_banner() ->
               "~n~n              Starting client..."
               "~n",
               [Product, Version]).
+
+validate(#{host := Host,
+           port := Port,
+           heartbeat := Heartbeat})
+  when is_list(Host) and is_number(Port) and is_number(Heartbeat) ->
+    ok.
