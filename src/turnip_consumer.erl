@@ -18,6 +18,7 @@
 
 -define(SERVER, ?MODULE).
 
+%% todo: should have seperate sub state for callback mod state, modeled as a field on this process state
 -record(state, {mod     :: atom(),
                 tag     :: reference(),
                 queue   :: binary(),
@@ -51,6 +52,7 @@ handle_call(_Request, _From, State) ->
 
 handle_cast(connection_up, State) ->
     self() ! init,
+    %% todo: should call init on the callback module
     {noreply, State};
 handle_cast(_Msg, State) ->
     {noreply, State}.
