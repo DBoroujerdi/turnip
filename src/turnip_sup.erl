@@ -27,8 +27,6 @@ init([BrokerConfig]) ->
 %% private
 %%------------------------------------------------------------------------------
 
-%% todo: convert to use maps
-
 supervisor(Module) ->
     supervisor(Module, permanent).
 
@@ -54,4 +52,9 @@ worker(Id, Module, Restart, Args) ->
     child_spec(Id, Module, Restart, 5000, worker, Args).
 
 child_spec(Id, Module, Restart, Shutdown, Type, Args) ->
-    {Id, {Module, start_link, Args}, Restart, Shutdown, Type, [Module]}.
+    #{id => Id,
+      start => {Module, start_link, Args},
+      restart => Restart,
+      shutdown => Shutdown,
+      type => Type,
+      modules => [Module]}.
