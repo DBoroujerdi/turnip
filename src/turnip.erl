@@ -19,30 +19,22 @@
 %% i also decided they could be useful to users of turnip as they would not
 %% have to use both the amqp and turnip API in tandem, exposing their app to
 %% just one API conventions.
--export([open_channel/0,
-         close_channel/1,
-         declare_exchange/1,
+-export([declare_exchange/1,
          declare_exchange/2,
          declare_exchange/3,
          delete_exchange/1,
          delete_exchange/2,
          declare_queue/0,
          declare_queue/1,
-         declare_queue/2,
          delete_queue/1,
-         delete_queue/2,
          bind/3,
-         bind/4,
          unbind/3,
-         unbind/4,
+         publish/2,
          publish/3,
-         publish/4,
-         publish/5,
          subscribe/1,
          subscribe/2,
-         subscribe/3,
-         acknowledge/1,
-         acknowledge/2]).
+         acknowledge/1]).
+
 
 %%------------------------------------------------------------------------------
 %% callbacks
@@ -76,16 +68,6 @@ start() ->
 %% cause unnecessary burden on the library user to have to manage them
 %% themselves
 
-%% todo: producer pools - how will they work??
-
--spec open_channel() -> {ok, pid()}.
-open_channel() ->
-    turnip_connection_mgr:open_channel().
-
--spec close_channel(pid()) -> ok | {error, any()}.
-close_channel(_Channel) ->
-    ok.
-
 
 %% -spec get_config() -> term().
 %% get_config() ->
@@ -96,6 +78,8 @@ close_channel(_Channel) ->
 -type type() :: direct | fanout | headers.
 
 
+
+-spec declare_exchange(binary()) -> ok.
 declare_exchange(Name) ->
     turnip_channel_pool:execute(declare_exchange, [Name]).
 
@@ -110,85 +94,75 @@ declare_exchange(Channel, Name, Type) ->
     turnip_amqp:declare_exchange(Channel, Name, atom_to_binary(Type, utf8)).
 
 
+
+-spec delete_exchange(binary()) -> ok.
 delete_exchange(Name) ->
     turnip_channel_pool:execute(delete_exchange, [Name]).
 
+-spec delete_exchange(pid(), binary()) -> ok.
 delete_exchange(Channel, Name) ->
     turnip_amqp:delete_exchange(Channel, Name).
 
 
+
+-spec declare_queue() -> ok.
 declare_queue() ->
     turnip_channel_pool:execute(declare_queue).
 
-declare_queue(Channel) when is_pid(Channel) ->
-    turnip_amqp:declare_queue(Channel);
+-spec declare_queue(binary()) -> ok.
 declare_queue(Name) ->
     turnip_channel_pool:execute(declare_queue, [Name]).
 
-declare_queue(Channel, Name) ->
-    turnip_amqp:declare_queue(Channel, Name).
-
+-spec delete_queue(binary()) -> ok.
 delete_queue(Name) ->
     turnip_channel_pool:execute(delete_queue, [Name]).
 
-delete_queue(Channel, Name) ->
-    turnip_amqp:delete_queue(Channel, Name).
 
 
+-spec bind(binary(), binary(), binary()) -> ok.
 bind(Queue, Exchange, RoutingKey) ->
     turnip_channel_pool:execute(bind, [Queue, Exchange, RoutingKey]).
 
--spec bind(pid(), binary(), binary(), binary()) -> ok.
-bind(Channel, Queue, Exchange, RoutingKey) ->
-    turnip_amqp:bind(Channel, Queue, Exchange, RoutingKey).
-
+-spec unbind(binary(), binary(), binary()) -> ok.
 unbind(Queue, Exchange, RoutingKey) ->
     turnip_channel_pool:execute(unbind, [Queue, Exchange, RoutingKey]).
 
--spec unbind(pid(), binary(), binary(), binary()) -> ok.
-unbind(_Channel, _Queue, _Exchange, _RoutingKey) ->
-    ok.
 
 
-publish(Payload, Exchange, RoutingKey) ->
-    turnip_channel_pool:execute(publish, [Payload, Exchange, RoutingKey]).
+-spec publish(binary(), binary()) -> ok.
+publish(Payload, RoutingKey) ->
+    publish(Payload, RoutingKey, <<>>).
 
-%% todo: remove once consumers is done
-%% should create a publisher per queue/message-type?
-publish(Channel, Payload, Exchange, RoutingKey) ->
-    publish(Channel, Payload, Exchange, RoutingKey, []).
+-spec publish(binary(), binary(), binary()) -> ok.
+publish(Payload, RoutingKey, Exchange) ->
+    turnip_channel_pool:execute(publish, [Payload, RoutingKey, Exchange]).
 
-%% todo: pool executor for this?
-%% todo: what should props be?
--spec publish(pid(), binary(), binary(), binary(), list()) -> ok.
-publish(Channel, Payload, Exchange, RoutingKey, _Props) ->
-    turnip_amqp:publish(Channel, Payload, Exchange, RoutingKey).
 
+
+-spec subscribe(binary()) -> ok.
 subscribe(Queue) ->
-    turnip_channel_pool:execute(subscribe, [Queue]).
+    subscribe(Queue, self()).
 
-subscribe(Channel, Queue) when is_pid(Channel) ->
-    subscribe(Channel, Queue, self());
-
+-spec subscribe(binary(), pid()) -> ok.
 subscribe(Queue, Consumer) ->
     turnip_channel_pool:execute(subscribe, [Queue, Consumer]).
 
-subscribe(Channel, Queue, Consumer) ->
-    turnip_amqp:subscribe(Channel, Queue, Consumer).
 
 
+-spec acknowledge(reference()) -> ok.
 acknowledge(Tag) ->
     turnip_channel_pool:execute(acknowledge, [Tag]).
 
-acknowledge(Channel, Tag) ->
-    turnip_amqp:acknowledge(Channel, Tag).
 
 
+-spec start_consumer(binary(), module()) -> ok.
 start_consumer(Queue, Callback) ->
     start_consumers(Queue, Callback, 1).
 
+-spec start_consumers(binary(), module(), number()) -> ok.
 start_consumers(Queue, Callback, Num) ->
     turnip_consumer_pools_sup:start(Queue, Callback, Num).
+
 
 %%------------------------------------------------------------------------------
 %% private

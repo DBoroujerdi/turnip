@@ -63,7 +63,7 @@ handle_info({#'basic.deliver'{delivery_tag = Tag}, {amqp_msg, _, Content}},
             #state{mod=Mod, channel=Channel} = State) ->
     case Mod:handle(Content) of
         ack ->
-            ok = turnip:acknowledge(Channel, Tag),
+            ok = turnip_amqp:acknowledge(Channel, Tag),
             {noreply, State};
         _ ->
             {noreply, State}
@@ -73,13 +73,13 @@ handle_info({#'basic.deliver'{delivery_tag = Tag}, {amqp_msg, _, Content}},
 %%     self() ! init,
 %%     {noreply, State#state{tag=undefined, channel=undefined}};
 handle_info(init, State) ->
-    {ok, Channel} = turnip:open_channel(),
+    {ok, Channel} = turnip_connection_mgr:open_channel(),
     %% true = link(Channel),
     ok = turnip_consumer_registry:register(),
     self() ! subscribe,
     {noreply, State#state{channel=Channel}};
 handle_info(subscribe, #state{channel=Channel, queue=Queue} = State) ->
-    {ok, Tag} = turnip:subscribe(Channel, Queue),
+    {ok, Tag} = turnip_amqp:subscribe(Channel, Queue),
     {noreply, State#state{tag=Tag}};
 handle_info(_Info, State) ->
     {noreply, State}.

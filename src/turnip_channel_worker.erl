@@ -43,13 +43,13 @@ init([]) ->
 
 handle_call({exec, JobFn, Args}, _, #state{channel = Channel} = State)
   when Channel =/= undefined ->
-    {reply, erlang:apply(turnip, JobFn, [Channel] ++ Args), State}.
+    {reply, erlang:apply(turnip_amqp, JobFn, [Channel] ++ Args), State}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
 handle_info(init, State) ->
-    {ok, Channel} = turnip:open_channel(),
+    {ok, Channel} = turnip_connection_mgr:open_channel(),
     true = erlang:link(Channel),
     {noreply, State#state{channel=Channel}};
 handle_info(_Info, State) ->

@@ -46,22 +46,7 @@ end_per_suite(Config) ->
 %% tests
 %%------------------------------------------------------------------------------
 
-this_is_a_test(Config) ->
-    ct_common:doc("This is an example test case"),
-
-    Config.
-
-open_channel_test(Config) ->
-    ct_common:doc("Tests that Turnip can open a new channel"),
-
-    {ok, _ChannelPid} = turnip:open_channel(),
-
-    %% todo: is it idiomatic to assert with a test framework assertion
-    %% or to just do it with pattern matching?
-
-    Config.
-
-channel_pool_test(Config) ->
+declare_channel_test(Config) ->
     ct_common:doc("Performs a declare action to test the internal channel pool"),
 
     {ok, QueueName} = turnip:declare_queue(),
@@ -76,12 +61,11 @@ channel_pool_test(Config) ->
 consumer_test(Config) ->
     ct_common:doc("Tests that messages published can be consumed"),
 
-    {ok, Channel} = turnip:open_channel(),
     ok = msg_collector:subscribe(),
 
     {ok, _} = turnip:start_consumer(<<"test_queue">>, test_consumer),
-    ok = turnip:declare_queue(Channel, <<"test_queue">>),
-    ok = turnip:publish(Channel, <<"Hello, World!">>, <<>>, <<"test_queue">>),
+    ok = turnip:declare_queue(<<"test_queue">>),
+    ok = turnip:publish(<<"Hello, World!">>, <<"test_queue">>),
 
     {ok, <<"Hello, World!">>} = msg_collector:receive_msg(),
 

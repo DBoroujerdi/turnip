@@ -79,9 +79,13 @@ open_channel(Connection) ->
     amqp_connection:open_channel(Connection).
 
 -spec publish(pid(), binary(), binary(), binary()) -> ok.
-publish(Channel, Payload, Exchange, Key) ->
+publish(Channel, Payload, Key, Exchange) ->
     Publish = #'basic.publish'{exchange = Exchange, routing_key = Key},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = Payload}).
+
+-spec subscribe(pid(), binary()) -> {ok, reference()}.
+subscribe(Channel, Queue) ->
+    subscribe(Channel, Queue, self()).
 
 -spec subscribe(pid(), binary(), pid()) -> {ok, reference()}.
 subscribe(Channel, Queue, Consumer) ->
