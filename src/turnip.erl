@@ -62,21 +62,8 @@ stop(_State) ->
 start() ->
     application:ensure_all_started(?MODULE).
 
-%% todo: not completely happy exposing this to the user
-%% would like to find an elegant way to manage channels in the
-%% library. Having to pass in channels to the Library may
-%% cause unnecessary burden on the library user to have to manage them
-%% themselves
 
-
-%% -spec get_config() -> term().
-%% get_config() ->
-%%     application:get_env(?MODULE, config).
-
-
-%% types
 -type type() :: direct | fanout | headers.
-
 
 
 -spec declare_exchange(binary()) -> ok.
