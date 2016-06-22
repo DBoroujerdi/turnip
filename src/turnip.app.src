@@ -10,7 +10,8 @@
     sasl,
     inets,
     ssl,
-    poolboy
+    poolboy,
+    env
    ]},
   {env,[
         {rabbit_host, "docker_host"},
