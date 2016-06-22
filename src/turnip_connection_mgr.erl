@@ -18,15 +18,6 @@
 
 -record(state, {con :: pid(), config :: turnip:broker_cfg()}).
 
-%% todo: consider moving all functionality into turnip module as the inclusion
-%% of consumer channel management pushes its scope beyond just connection
-%% management.
-%% this process now also serves as a register for consumers - should really
-%% be the 'turnip' main process.
-
-%% todo: consider using gproc instead of this process to register consumers
-%% this process becomes a bottle neck managing the ups and downs of
-%% consumers when is should be managing connections (single responsibility).
 
 %%------------------------------------------------------------------------------
 %% public
