@@ -30,8 +30,7 @@ execute(Fun, Args) ->
             turnip_channel_worker:execute(Worker, Fun, Args)
         end,
 
-    %% todo: externalise retry count
-    try_execute(Transaction, Fun, Args, 5).
+    try_execute(Transaction, Fun, Args, env:get_integer(channel_retry_count)).
 
 try_execute(Transaction, Fun, Args, NumAttempts) ->
     case catch poolboy:transaction(?POOL_ID, Transaction) of
