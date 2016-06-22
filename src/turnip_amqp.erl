@@ -15,10 +15,6 @@
 %% otherwise, config will be the same, so i need a polymorphic function
 %% from which to create a amqp_params record type.
 
-%% todo: need a spec which defines the broker config. and where should this
-%% spec live. realising now that i don't know the idiomatic way for spec
-%% placement.
-
 -spec connect(map()) -> {ok, pid()} | {error, any()}.
 connect(#{host := embedded}) ->
     start(#'amqp_params_direct'{});
