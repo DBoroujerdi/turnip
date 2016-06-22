@@ -30,7 +30,7 @@ execute(Fun, Args) ->
             turnip_channel_worker:execute(Worker, Fun, Args)
         end,
 
-    try_execute(Transaction, Fun, Args, env:get_integer(channel_retry_count)).
+    try_execute(Transaction, Fun, Args, env:get_integer(turnip, channel_retry_count)).
 
 try_execute(Transaction, Fun, Args, NumAttempts) ->
     case catch poolboy:transaction(?POOL_ID, Transaction) of
