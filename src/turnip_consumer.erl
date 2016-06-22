@@ -18,8 +18,8 @@
 
 -define(SERVER, ?MODULE).
 
-%% todo: should have seperate sub state for callback mod state, modeled as a field on this process state
 -record(state, {mod     :: atom(),
+                state   :: any(),
                 tag     :: reference(),
                 queue   :: binary(),
                 channel :: pid()}).
@@ -31,8 +31,8 @@
 %% public
 %%------------------------------------------------------------------------------
 
-start_link(Queue, Callback) ->
-    gen_server:start_link(?MODULE, [Queue, Callback], []).
+start_link(Queue, Mod) ->
+    gen_server:start_link(?MODULE, [Queue, Mod], []).
 
 event(Pid, Event) ->
     gen_server:cast(Pid, Event).
@@ -41,31 +41,33 @@ event(Pid, Event) ->
 %% gen_server callbacks
 %%------------------------------------------------------------------------------
 
-init([Queue, Callback]) ->
+init([Queue, Mod]) ->
     process_flag(trap_exit, true),
     self() ! init,
-    {ok, #state{queue=Queue, mod=Callback}}.
+    {ok, #state{queue=Queue, mod=Mod}}.
 
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
 
-handle_cast(connection_up, State) ->
+handle_cast(connection_up, #state{mod=Mod} = State) ->
     self() ! init,
+    {ok, ModState} = Mod:init(),
     %% todo: should call init on the callback module
-    {noreply, State};
+    {noreply, State#state{state=ModState}};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
 handle_info(#'basic.consume_ok'{}, State) ->
     {noreply, State};
 handle_info({#'basic.deliver'{delivery_tag = Tag}, {amqp_msg, _, Content}},
-            #state{mod=Mod, channel=Channel} = State) ->
-    case Mod:handle(Content) of
-        ack ->
+            #state{mod=Mod, state=ModState, channel=Channel} = State) ->
+    case Mod:handle(Content, ModState) of
+        {ack, NewModState} ->
             ok = turnip_amqp:acknowledge(Channel, Tag),
-            {noreply, State};
+            {noreply, State#state{state=NewModState}};
         _ ->
+            %% todo: how should we behave here?
             {noreply, State}
     end;
 

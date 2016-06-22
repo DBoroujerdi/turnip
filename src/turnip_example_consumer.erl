@@ -2,16 +2,16 @@
 
 -behaviour(turnip_consumer_behaviour).
 
--export([init/1,
-         handle/1]).
+-export([init/0,
+         handle/2]).
 
 %%------------------------------------------------------------------------------
 %% callbacks
 %%------------------------------------------------------------------------------
 
-init(_Args) ->
+init() ->
     {ok, #{}}.
 
-handle(Msg) ->
+handle(Msg, State) ->
     io:format("~p MSG: ~p~n", [self(), Msg]),
-    ack.
+    {ack, State}.
