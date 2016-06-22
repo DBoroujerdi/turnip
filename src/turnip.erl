@@ -35,6 +35,7 @@
          subscribe/2,
          acknowledge/1]).
 
+-export_type([broker_cfg/0]).
 
 %%------------------------------------------------------------------------------
 %% callbacks
@@ -64,6 +65,10 @@ start() ->
 
 
 -type type() :: direct | fanout | headers.
+
+-type broker_cfg() :: #{host => binary(),
+                        port => number(),
+                        heartbeat => number()}.
 
 
 -spec declare_exchange(binary()) -> ok.
@@ -168,6 +173,7 @@ print_banner() ->
               "~n",
               [Product, Version]).
 
+-spec validate(broker_cfg()) -> ok.
 validate(#{host := Host,
            port := Port,
            heartbeat := Heartbeat})

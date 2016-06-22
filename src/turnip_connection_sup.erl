@@ -16,7 +16,6 @@
 %%------------------------------------------------------------------------------
 
 start_link(BrokerConfig) ->
-
     supervisor:start_link({local, ?SERVER}, ?MODULE, [BrokerConfig]).
 
 

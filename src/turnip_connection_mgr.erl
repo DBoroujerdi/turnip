@@ -16,7 +16,7 @@
 
 -define(SERVER, ?MODULE).
 
--record(state, {con :: pid(), config :: map()}).
+-record(state, {con :: pid(), config :: turnip:broker_cfg()}).
 
 %% todo: consider moving all functionality into turnip module as the inclusion
 %% of consumer channel management pushes its scope beyond just connection
