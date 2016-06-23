@@ -17,7 +17,7 @@ ok = turnip:start(),
 
 ok = turnip:start_consumer(Q, turnip_example_consumer).
 
-ok = turnip:publish(<<"Hello, World!">>, <<>>, Q).
+ok = turnip:publish(<<"Hello, World!">>, Q).
 
 %% <0.629.0> MSG: <<"Hello, World!">>
 ```
