@@ -20,7 +20,6 @@ ok = turnip:start(),
 
 ok = turnip:start_consumer(Q, turnip_example_consumer).
 
-<<<<<<< HEAD
 ok = turnip:publish(Payload = <<"Hello, World!">>, RoutingKey = Q).
 
 %% <0.629.0> MSG: <<"Hello, World!">>
