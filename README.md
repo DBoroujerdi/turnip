@@ -3,21 +3,46 @@
 
 Turnip is a wrapper around the [RabbitMq](https://github.com/rabbitmq/rabbitmq-erlang-client) library, providing some useful extra features, such as,
 
-- Broker connection management
-- Simpler api
-- Consumer pooling
-- Consumer behaviour
+- Reconnection if connection is lost
+- Consumer pooling with reconnecting channels when channel or connection is lost
 
-## Basic Usage
+## Usage
 
+### Starting
 ```erlang
 ok = turnip:start(),
+```
 
+### Basic publishing
+
+```erlang
 {ok, Q} =  = turnip:declare_queue(),
 
 ok = turnip:start_consumer(Q, turnip_example_consumer).
 
-ok = turnip:publish(<<"Hello, World!">>, <<>>, Q).
+ok = turnip:publish(Payload = <<"Hello, World!">>, RoutingKey = Q).
+
+%% <0.629.0> MSG: <<"Hello, World!">>
+```
+
+### Routing Usage
+
+```erlang
+Exchange = <<"my_exchange">>,
+
+ok = turnip:declare_exchange(Exchange),
+
+{ok, Q} = turnip:declare_queue(),
+
+%% this will start 5 processes all consuming from the same Q, each with
+%% their own channel
+{ok, _} = turnip:start_consumers(Q, turnip_example_consumer, _NumConsumers = 5),
+
+ok = turnip:bind(Q, Exchange, <<"abcd.*">>),
+
+ok = turnip:publish(_Payload = <<"Hello, World!">>,
+                    _RoutingKey = <<"abcd.1234">>,
+                    _Exchange = Exchange).
 
 %% <0.629.0> MSG: <<"Hello, World!">>
 ```
