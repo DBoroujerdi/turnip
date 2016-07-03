@@ -30,6 +30,7 @@ init_per_suite(Config) ->
                            port => 5671,
                            heartbeat => 5
                          }),
+    application:set_env(turnip, channel_retry_count, 5),
 
     application:ensure_all_started(turnip),
 
@@ -68,6 +69,31 @@ consumer_test(Config) ->
     ok = turnip:publish(<<"Hello, World!">>, <<"test_queue">>),
 
     {ok, <<"Hello, World!">>} = msg_collector:receive_msg(),
+
+    Config.
+
+routing_test(Config) ->
+    ct_common:doc("Tests message routing"),
+
+    ok = msg_collector:subscribe(),
+
+    Exchange = <<"my_exchange">>,
+
+    ok = turnip:declare_exchange(Exchange),
+
+    {ok, Q} = turnip:declare_queue(),
+
+    {ok, _} = turnip:start_consumer(Q, test_consumer),
+
+    ok = turnip:bind(Q, Exchange, <<"red">>),
+
+    ok = turnip:publish(<<"Red Message">>, <<"red">>, Exchange),
+
+    {ok, <<"Red Message">>} = msg_collector:receive_msg(),
+
+    ok = turnip:publish(<<"Blue Message">>, <<"blue">>, Exchange),
+
+    {error, timeout} = msg_collector:receive_msg(),
 
     Config.
 

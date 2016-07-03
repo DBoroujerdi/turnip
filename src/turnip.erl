@@ -21,7 +21,6 @@
 %% just one API conventions.
 -export([declare_exchange/1,
          declare_exchange/2,
-         declare_exchange/3,
          delete_exchange/1,
          delete_exchange/2,
          declare_queue/0,
@@ -73,18 +72,12 @@ start() ->
 
 -spec declare_exchange(binary()) -> ok.
 declare_exchange(Name) ->
-    turnip_channel_pool:execute(declare_exchange, [Name]).
+    declare_exchange(Name, direct).
 
--spec declare_exchange(pid(), list() | binary()) -> ok | {error | any()}.
-declare_exchange(Channel, Name) ->
-    declare_exchange(Channel, Name, direct).
-
--spec declare_exchange(pid(), Name, Type) -> ok | {error | any()} when
-      Name :: binary() | string() | atom(),
-      Type :: type().
-declare_exchange(Channel, Name, Type) ->
-    turnip_amqp:declare_exchange(Channel, Name, atom_to_binary(Type, utf8)).
-
+-spec declare_exchange(binary(), type()) -> ok.
+declare_exchange(Name, Type) ->
+    turnip_channel_pool:execute(declare_exchange, [Name,
+                                                   atom_to_binary(Type, utf8)]).
 
 
 -spec delete_exchange(binary()) -> ok.
