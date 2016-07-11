@@ -62,19 +62,8 @@ ok = turnip:publish(_Payload = <<"Hello, World!">>,
 ```
 
 
-### Example Config
-
-```erlang
-```
-
-
-### Example Consumer
-
-```erlang
-```
-
-
-
 ## Authors
+
+Daniel Boroujerdi
 
 ## Liscense
